@@ -1,0 +1,25 @@
+version: "3"
+services:
+  web:
+    build: .
+    container_name: paper_web
+    env_file:
+      - env_file
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./app/:/home/app/
+    depends_on:
+      - db
+  db:
+    container_name: paper_db
+    image: postgres:10.1
+    env_file:
+      - env_file
+    ports:
+      - "5432:5432"
+    volumes:
+      - "dbdata:/var/lib/postgresql/data"
+
+volumes:
+  dbdata:
