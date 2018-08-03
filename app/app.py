@@ -9,12 +9,17 @@ from flask import Flask
 from flask_restful import abort, Api, Resource
 from flask_restful import fields, marshal_with
 from dbcontroller import DBController
-import subprocess, time
+import subprocess, time, sys
+import pickle
+import redis
+
+CACHE_TTL_SECONDS = 60
 
 app = Flask(__name__)
 api = Api(app)
 
 dbController = DBController()
+cache = redis.Redis(host='paper_cache', port=6379)
 
 author_list_fields = {
     'id':   fields.Integer(attribute='author_id'),
@@ -41,7 +46,22 @@ def abort_if_author_id_is_invalid(author_id):
         int(author_id)
     except ValueError:
         abort(404, message="author id {} doesn't exist".format(author_id))
-    
+
+def get_author_cache_key(author_id):
+    return 'authorinfo_' + str(author_id)
+
+def set_to_cache(key, obj):
+    pickled_object = pickle.dumps(obj)
+    cache.setex(key, pickle.dumps(obj), CACHE_TTL_SECONDS)
+
+def get_from_cache(key):
+    pickled_object = cache.get(key)
+    if pickled_object is not None:
+        obj = pickle.loads(pickled_object)
+        print("key [{}] hit the cache!".format(key), file=sys.stderr)
+        return obj
+    else:
+        print("key [{}] isn't in the cache.".format(key), file=sys.stderr) 
 
 class ServiceHealth(Resource):
     def get(self):
@@ -50,15 +70,24 @@ class ServiceHealth(Resource):
 class AuthorList(Resource):
     @marshal_with(author_list_fields)
     def get(self):
-        return dbController.getAllAuthors()
+        key = 'author_list'
+        author_list = get_from_cache(key)
+        if author_list is None:
+            author_list = dbController.getAllAuthors()
+            set_to_cache(key, author_list)
+        return author_list
     
 class Authorinfo(Resource):
     @marshal_with(author_info_field)
     def get(self, author_id):
         abort_if_author_id_is_invalid(author_id)
-        author = dbController.getAuthorInfo(author_id)
-        if not author:
-            abort_if_author_doesnt_exist(author_id)
+        key = get_author_cache_key(author_id)
+        author = get_from_cache(key)
+        if author is None:
+            author = dbController.getAuthorInfo(author_id)
+            if not author:
+                abort_if_author_doesnt_exist(key)
+            set_to_cache(key, author)
         return author
 
 ##
