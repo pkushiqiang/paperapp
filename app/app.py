@@ -5,6 +5,8 @@ Created on Fri Jul 27 14:27:32 2018
 
 @author: shiqiang
 """
+
+import os
 from flask import Flask
 from flask_restful import abort, Api, Resource
 from flask_restful import fields, marshal_with
@@ -18,7 +20,13 @@ CACHE_TTL_SECONDS = 60
 app = Flask(__name__)
 api = Api(app)
 
-dbController = DBController()
+DB_HOST='db'
+DB_USER=os.environ['POSTGRES_USER']
+DB_PASS = os.environ['POSTGRES_PASSWORD']
+DB_NAME = os.environ['POSTGRES_DB']
+DB_PORT = '5432'
+
+dbController = DBController(DB_NAME, DB_USER, DB_PASS, DB_HOST, DB_PORT)
 cache = redis.Redis(host='paper_cache', port=6379)
 
 author_list_fields = {
@@ -65,7 +73,7 @@ def get_from_cache(key):
 
 class ServiceHealth(Resource):
     def get(self):
-        return {'status': 'Good'}
+        return {"status": "Good"}
     
 class AuthorList(Resource):
     @marshal_with(author_list_fields)
@@ -101,7 +109,7 @@ def wait_for_db_server():
     connected = False
     while not connected:
         try:
-            dbController.connect()
+            dbController.connect_to_db()
             connected = True
         except Exception as err:
             print("Connect DB met error", err)

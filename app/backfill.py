@@ -5,17 +5,24 @@ Created on Fri Jul 27 14:27:32 2018
 
 @author: shiqiang
 """
-
+import os
 import csv
 from domain_classes import Author, Paper
 from dbcontroller import DBController
+
 
 AUTHORS_CSV_FILE = 'authors.csv'
 PAPERS_CSV_FILE = 'papers.csv'
 author_ids_set = set()
 
-dbController = DBController()
-dbController.connect()
+DB_HOST='db'
+DB_USER =  os.environ['POSTGRES_USER']
+DB_PASS = os.environ['POSTGRES_PASSWORD']
+DB_NAME = os.environ['POSTGRES_DB']
+DB_PORT = '5432'
+
+dbController = DBController(DB_NAME, DB_USER, DB_PASS, DB_HOST, DB_PORT)
+dbController.connect_to_db()
 
 def backfill_authors():
     with open(AUTHORS_CSV_FILE) as csv_file:

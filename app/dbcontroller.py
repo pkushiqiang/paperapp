@@ -9,28 +9,27 @@ Created on Fri Jul 27 16:02:14 2018
 
 from domain_classes import Author, Paper
 import psycopg2
-import os
-
-DB_HOST='db'
-DB_USER=os.environ['POSTGRES_USER']
-DB_PASS = os.environ['POSTGRES_PASSWORD']
-DB_NAME = os.environ['POSTGRES_DB']
-DB_PORT = '5432'
 
 class DBController:
+
+    def __init__(self, db_name, db_user, db_pass, db_host, db_port):
+        self.db_name = db_name
+        self.db_user = db_user
+        self.db_pass = db_pass
+        self.db_host = db_host
+        self.db_port = db_port
+        self.conn = None
+
     def __del__(self ):  
         if self.conn:
             self.conn.close()
     
-    def connect(self):
-        self.conn = psycopg2.connect(database = DB_NAME, user = DB_USER,
-                                password = DB_PASS, host = DB_HOST, port = DB_PORT)
-        
-
     def connect_to_db(self):
-        self.conn = psycopg2.connect(database = "postgres", user = "postgres",
-                                password = "ai2_iview", host = "127.0.0.1", port = "5432")
-    
+        if self.conn:
+            self.conn.close()
+        self.conn = psycopg2.connect(database = self.db_name, user = self.db_user,
+                                password = self.db_pass, host = self.db_host, port = self.db_port)
+ 
     
     def if_table_exist(self, table_name):
         cur = self.conn.cursor()
@@ -108,7 +107,6 @@ class DBController:
         row = rows[0]
         author = Author(row[0], row[1],row[2])
         author.parseAliases()
-        print(author)
         
         cur.execute("SELECT papers.paper_id, papers.title, papers.author_ids, papers.abstract, papers.published_year, papers.venue FROM author_paper, papers WHERE author_id=%s AND author_paper.paper_id=papers.paper_id", (author_id,))
         rows = cur.fetchall()
@@ -117,8 +115,6 @@ class DBController:
             paper = Paper(row[0], row[1], row[2], row[3], row[4], row[5])
             paper.parse_author_list()
             author.papers.append(paper)
-            
-            
         return author
     
     def getAllAuthors(self):
@@ -130,7 +126,6 @@ class DBController:
             author = Author(row[0], row[1],row[2])
             author.parseAliases()
             authors.append(author)
-            
         return authors
 
         
