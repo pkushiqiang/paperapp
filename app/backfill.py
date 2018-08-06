@@ -4,6 +4,9 @@
 Created on Fri Jul 27 14:27:32 2018
 
 @author: shiqiang
+
+The module implements backfill the tables from CSV files.
+
 """
 import os
 import csv
@@ -25,6 +28,9 @@ dbController = DBController(DB_NAME, DB_USER, DB_PASS, DB_HOST, DB_PORT)
 dbController.connect_to_db()
 
 def backfill_authors():
+    """
+        Backfill authors into author table. 
+    """
     with open(AUTHORS_CSV_FILE) as csv_file:
         csv_reader = csv.reader(csv_file, quotechar='"', delimiter=',', quoting=csv.QUOTE_ALL, skipinitialspace=True)
         line_count = 0
@@ -41,6 +47,10 @@ def backfill_authors():
 
 
 def backfill_good_papers():
+    """
+        Backfill papers into paper table. Ignore lines with format error.
+        Insert the autor paper relationship into author-paper table.
+    """
     with open(PAPERS_CSV_FILE) as csv_file:
         csv_reader = csv.reader(csv_file, quotechar='"', delimiter=',', quoting=csv.QUOTE_ALL, skipinitialspace=True)
         line_count = 0

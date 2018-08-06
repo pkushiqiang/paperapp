@@ -4,8 +4,10 @@
 Created on Fri Jul 27 14:27:32 2018
 
 @author: shiqiang
-"""
 
+This module provides some utility function for testing.
+
+"""
 
 from domain_classes import Author, Paper
 

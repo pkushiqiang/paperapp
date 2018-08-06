@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Tue Jul 24 10:44:08 2018
@@ -6,7 +5,15 @@ Created on Tue Jul 24 10:44:08 2018
 @author: shiqiang
 """
 
+"""
+    This module contains the domain classes.
+"""
+
 class Author :
+    """
+        Author - The domain class, which has attributes:
+                 author_id, author_name, aliases_str
+    """
     def __init__(self, author_id, author_name, aliases_str):
         self.author_id = author_id
         self.author_name = author_name
@@ -20,6 +27,10 @@ class Author :
     
     
 class Paper :
+    """
+        Paper - The domain class, which has attributes:
+                 paper_id, title, author_ids_str, abstract, published_year, venue
+    """
     def __init__(self, paper_id, title, author_ids_str, abstract, published_year, venue):
         self.paper_id = paper_id
         self.title = title

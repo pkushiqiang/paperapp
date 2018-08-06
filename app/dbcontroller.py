@@ -5,12 +5,17 @@
 Created on Fri Jul 27 16:02:14 2018
 
 @author: shiqiang
+ 
+    This module contains the implements the DBController
 """
 
 from domain_classes import Author, Paper
 import psycopg2
 
 class DBController:
+    """
+        The DBController wrapper all DB operations.
+    """
 
     def __init__(self, db_name, db_user, db_pass, db_host, db_port):
         self.db_name = db_name
@@ -18,13 +23,17 @@ class DBController:
         self.db_pass = db_pass
         self.db_host = db_host
         self.db_port = db_port
-        self.conn = None
+        self.conn = None # set conn as None when just create the instance. 
 
     def __del__(self ):  
         if self.conn:
+        # delete connection when destroy the object.
             self.conn.close()
     
     def connect_to_db(self):
+        """
+           connect to the database
+        """
         if self.conn:
             self.conn.close()
         self.conn = psycopg2.connect(database = self.db_name, user = self.db_user,
@@ -32,11 +41,18 @@ class DBController:
  
     
     def if_table_exist(self, table_name):
+        """
+           test if table exist.
+        """
         cur = self.conn.cursor()
         cur.execute("SELECT * FROM pg_catalog.pg_tables where tablename=%s", (table_name,))
         return bool(cur.rowcount)
     
     def create_tables(self):
+        """
+           Create tables.
+        """        
+
         cur = self.conn.cursor()
         
         cur.execute("DROP TABLE IF EXISTS author_paper")
@@ -68,12 +84,20 @@ class DBController:
         
         
     def insert_author(self, author):
+        """
+           Insert author into DB.
+           :param author: The author instance.
+        """
         cur = self.conn.cursor()
         cur.execute("INSERT INTO authors (author_id, author_name, aliases) VALUES (%s, %s, %s)",
                        (author.author_id, author.author_name, author.aliases_str))
         self.conn.commit()
         
     def insert_paper(self, paper):
+        """
+           Insert paper into DB.
+           :param paper: The paper instance.
+        """
         cur = self.conn.cursor()
         cur.execute("INSERT INTO papers (title, author_ids, abstract, published_year, venue) VALUES (%s, %s, %s, %s, %s)  RETURNING paper_id",
                     (paper.title, paper.author_ids_str, paper.abstract, paper.published_year, paper.venue))
@@ -83,6 +107,11 @@ class DBController:
         return paper_id
         
     def insert_auther_paper(self, paper, author_ids_set):
+        """
+           Insert author paper relationship into DB.
+           :param paper: The paper instance.
+           :param author_ids_set: author id list.
+        """
         cur = self.conn.cursor()
         author_ids = paper.author_ids_str.split("|")
         for idstr in author_ids:
@@ -93,6 +122,10 @@ class DBController:
         self.conn.commit()        
     
     def getAuthorInfo(self, author_id):
+        """
+           Get Author and all his papers
+           :param author_id: The id of the author.
+        """
         cur = self.conn.cursor()
         try:
             cur.execute("SELECT * FROM authors where author_id = %s", (author_id,))
@@ -118,6 +151,9 @@ class DBController:
         return author
     
     def getAllAuthors(self):
+        """
+           Get all author in DB
+        """
         authors  = list()
         cur = self.conn.cursor()
         cur.execute("SELECT * FROM authors")
