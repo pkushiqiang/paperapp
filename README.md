@@ -13,7 +13,7 @@ Start up the service
 
     3.  paper_cache: Redis server
 
-3.  If it is the first time to sun the service, it will backfill the data
+3.  If it is the first time to run the service, it will backfill the data
     automatically. You can see it will download the csv files, and backfill to
     the database.
 

@@ -146,11 +146,10 @@ def wait_for_db_server():
             dbController.connect_to_db()
             connected = True
         except Exception as err:
-            print("Connect DB met error", err)
-            print("Cannot connect to db, will retry later...\n")
+            print("Cannot connect to db, will retry later...\n", file=sys.stderr)
             time.sleep(5)
 
-    print("DB server is started, continue...")
+    print("DB server is started, continue start the service...", file=sys.stderr)
 
 def backfill_if_necessary():
     """
