@@ -7,7 +7,7 @@ Start up the service
 
 2.  There will be three containers to be created:
 
-    1.  paper_web: the  Flask-restful app
+    1.  paper_web: Tthe Flask-restful app
 
     2.  paper_db: PostgreSQL server
 
@@ -17,9 +17,9 @@ Start up the service
     automatically. You can see it will download the csv files, and backfill to
     the database.
 
-You will keep seeing messages like this: "Meet csv format error in line:  119”,
-which means the program meets CSV format error in papers.csv. The backfill process
-will take about 1 minutes.
+You will keep seeing messages like this: "Meet csv format error in line: 119”,
+which means the program meets CSV format error in papers.csv. The backfill
+process will take about 1 minutes.
 
 1.  You can see message like "Running on http://0.0.0.0:5000/ (Press CTRL+C to
     quit)”, which means the service app is ready.
@@ -27,17 +27,15 @@ will take about 1 minutes.
 Access the Service
 ------------------
 
-1.  <http://127.0.0.1:5000/>  - If it should shows
+1.  <http://127.0.0.1:5000/> - If the service is running,  it should show
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-{
-    "status": "Good"
-}
+{"status": "Good"}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1.  <http://127.0.0.1:5000/authors> - List all the authors
 
-2.  <http://127.0.0.1:5000/authorinfo/<author id>> - get author info, and all
+2.  http://127.0.0.1:5000/authorinfo/\<author-id\> - Get author info, and all
     his papers. e.g.<http://127.0.0.1:5000/authorinfo/1727782>
 
  
